@@ -1,0 +1,1 @@
+Copyright 2015 Stephen Cakebread <https://github.com/quantumrain/LD33>
