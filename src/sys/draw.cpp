@@ -265,11 +265,11 @@ void draw_context::rect(vec2 p0, vec2 p1, vec2 uv0, vec2 uv1, rgba c) const {
 	vert(p1.x, p1.y, uv1.x, uv1.y, c.r, c.g, c.b, c.a);
 }
 
-void draw_context::fill(int count, vec2* p, rgba c) const {
+void draw_context::fill(int count, const vec2* p, rgba c) const {
 	for(int i = 2; i < count; i++) tri(p[0], p[i - 1], p[i], c);
 }
 
-void draw_context::outline(int count, vec2* p, float line_width, rgba c) const {
+void draw_context::outline(int count, const vec2* p, float line_width, rgba c) const {
 	const int MAX_COUNT = 32;
 
 	vec2 n[MAX_COUNT];

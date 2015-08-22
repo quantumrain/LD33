@@ -99,8 +99,10 @@ struct draw_context {
 	void rect(vec2 p0, vec2 p1, vec2 uv0, vec2 uv1, rgba c0, rgba c1, rgba c2, rgba c3) const;
 	void rect(vec2 p0, vec2 p1, vec2 uv0, vec2 uv1, rgba c) const;
 
-	void fill(int count, vec2* p, rgba c) const;
-	void outline(int count, vec2* p, float line_width, rgba c) const;
+	void fill(int count, const vec2* p, rgba c) const;
+	void outline(int count, const vec2* p, float line_width, rgba c) const;
+
+	void fill(std::initializer_list<vec2> l, rgba c) const { return fill(l.size(), l.begin(), c); }
 
 	void shape(vec2 p, int vcount, float radius, float rot, rgba c) const;
 	void shape_outline(vec2 p, int vcount, float radius, float rot, float w, rgba c) const;

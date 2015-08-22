@@ -6,6 +6,8 @@
 #include "sound.h"
 #include "tile_map.h"
 
+#define DT (1.0f / 60.0f)
+
 struct world;
 
 enum entity_flag {

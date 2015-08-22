@@ -96,10 +96,10 @@ enum class colours : u32 { // clrs.cc
 	PURPLE = 0xB10DC9, BLACK = 0x111111, GREY   = 0xAAAAAA, SILVER  = 0xDDDDDD
 };
 
-#define RGBA_A(rgba_) ((((u32)(rgba_)) >> 24) & 0xFF)
-#define RGBA_R(rgba_) ((((u32)(rgba_)) >> 16) & 0xFF)
-#define RGBA_G(rgba_) ((((u32)(rgba_)) >>  8) & 0xFF)
-#define RGBA_B(rgba_) ((((u32)(rgba_))      ) & 0xFF)
+#define ARGB_A(rgba_) ((((u32)(rgba_)) >> 24) & 0xFF)
+#define ARGB_R(rgba_) ((((u32)(rgba_)) >> 16) & 0xFF)
+#define ARGB_G(rgba_) ((((u32)(rgba_)) >>  8) & 0xFF)
+#define ARGB_B(rgba_) ((((u32)(rgba_))      ) & 0xFF)
 
 struct rgba {
 	float r, g, b, a;
@@ -109,7 +109,9 @@ struct rgba {
 	rgba(f32 rgba_)                 : rgba(rgba_, rgba_, rgba_, rgba_) { }
 	rgba(f32 rgb_, f32 a_)          : rgba(rgb_,  rgb_,  rgb_,  a_   ) { }
 	rgba(vec4 v_)                   : rgba(v_.x,  v_.y,  v_.z,  v_.w ) { }
-	rgba(colours c_, f32 a_ = 1.0f) : rgba(RGBA_R(c_) / 255.0f, RGBA_G(c_) / 255.0f, RGBA_B(c_) / 255.0f, a_) { }
+	rgba(colours c_, f32 a_ = 1.0f) : rgba(ARGB_R(c_) / 255.0f, ARGB_G(c_) / 255.0f, ARGB_B(c_) / 255.0f, a_) { }
+	explicit rgba(u32 argb)			: rgba(ARGB_R(argb) / 255.0f, ARGB_G(argb) / 255.0f, ARGB_B(argb) / 255.0f, ARGB_A(argb) / 255.0f) { }
+	explicit rgba(i32 argb)			: rgba((u32)argb) { }
 };
 
 // etc
