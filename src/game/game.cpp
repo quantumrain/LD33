@@ -61,98 +61,6 @@ void game_init() {
 	spawn_entity(&g_world, new player);
 }
 
-void recurse(draw_context dcc, int i, float t) {
-	if (i < 0)
-		return;
-
-	draw_context dcw = dcc.copy();
-
-	float m = lerp(10.0f, 30.0f, ((i - 1) / 7.0f)) * lerp(1.0f, 0.15f, square((i - 1) / 7.0f));
-	float r = cosf(t + ((i - 1) / 7.0f) * TAU) * 0.5f;
-
-	dcc.push(rotate_z(r));
-	dcc.push(translate(vec3(-m, 0.0f, 0.0f)));
-
-	recurse(dcc, i - 1, t);
-
-	float s = lerp(10.0f, 30.0f, (i / 7.0f)) * lerp(1.0f, 0.15f, square(i / 7.0f));
-	float h = s * 0.5f;
-	if (i == 7) s *= 1.5f; // accidentally after h, but looks nicer for it
-
-	//dcw.push(rotate_z(cosf(t * 3.0f) * 0.1f));
-
-#if 1
-	// green 0xFFA3CE27
-	// purple 0xFF5026CC
-	// dark purple 0xFF3C1D99
-
-	draw_context dcs = dcw.copy().push(translate(vec3(s * 0.25f, 0.0f, 0.0f)));
-
-	dcs.copy().push(rotate_z(deg_to_rad(-55.0f))).fill({ vec2(-0.10f, 0.0f) * s, vec2( 0.00f,-2.0f) * s, vec2( 0.10f, 0.0f) * s }, rgba(0xFF6430FF));
-	dcs.copy().push(rotate_z(deg_to_rad( 55.0f))).fill({ vec2(-0.10f, 0.0f) * s, vec2( 0.00f, 2.0f) * s, vec2( 0.10f, 0.0f) * s }, rgba(0xFF6430FF));
-	dcs.copy().push(rotate_z(deg_to_rad(-25.0f))).fill({ vec2(-0.10f, 0.0f) * s, vec2( 0.00f,-1.5f) * s, vec2( 0.10f, 0.0f) * s }, rgba(0xFF6430FF));
-	dcs.copy().push(rotate_z(deg_to_rad( 25.0f))).fill({ vec2(-0.10f, 0.0f) * s, vec2( 0.00f, 1.5f) * s, vec2( 0.10f, 0.0f) * s }, rgba(0xFF6430FF));
-
-	if (i == 0) dcw.shape(vec2(-h, 0.0f), 3, s * 0.5f, PI, rgba(0xFFA3CE27));
-	dcw.shape(vec2(h, 0.0f), 3, s, 0.0f, rgba(0xFFA3CE27));
-	dcw.shape(vec2(0.0f, 0.0f), 4, s * 0.5f, 0.0f, rgba(0xFF6430FF));
-	dcw.shape(vec2(0.0f, 0.0f), 4, s * 0.25f, 0.0f, rgba(0xFFA3CE27));
-#else
-	if (i == 0) {
-		dcw.fill({
-				vec2( 0.500f, 0.866f) * h + vec2(-h, 0.0f),
-				vec2(-1.000f, 0.000f) * h + vec2(-h, 0.0f),
-				vec2(-0.000f, 0.000f) * h + vec2(-h, 0.0f),
-				vec2( 0.500f, 0.500f) * h + vec2(-h, 0.0f)
-			}, rgba(0xFFA3CE27));
-
-		dcw.fill({
-				vec2( 0.500f, -0.866f) * h + vec2(-h, 0.0f),
-				vec2(-1.000f, -0.000f) * h + vec2(-h, 0.0f),
-				vec2(-0.000f, -0.000f) * h + vec2(-h, 0.0f),
-				vec2( 0.500f, -0.500f) * h + vec2(-h, 0.0f)
-			}, rgba(0xFFA3CE27));
-	}
-
-	if (i == 7) {
-		dcw.fill({
-				vec2(-0.500f, 0.866f) * s + vec2(h, 0.0f),
-				vec2( 1.000f, 0.000f) * s + vec2(h, 0.0f),
-				vec2( 0.000f, 0.000f) * s + vec2(h, 0.0f),
-				vec2(-0.500f, 0.500f) * s + vec2(h, 0.0f)
-			}, rgba(0xFFA3CE27));
-
-		dcw.fill({
-				vec2(-0.500f, -0.866f) * s + vec2(h, 0.0f),
-				vec2( 1.000f, -0.000f) * s + vec2(h, 0.0f),
-				vec2( 0.000f, -0.000f) * s + vec2(h, 0.0f),
-				vec2(-0.500f, -0.500f) * s + vec2(h, 0.0f)
-			}, rgba(0xFFA3CE27));
-	}
-	else {
-		dcw.fill({
-				vec2(-0.500f, 0.866f) * s + vec2(h, 0.0f),
-				vec2( 0.366f, 0.366f) * s + vec2(h, 0.0f),
-				vec2( 0.000f, 0.000f) * s + vec2(h, 0.0f),
-				vec2(-0.500f, 0.500f) * s + vec2(h, 0.0f)
-			}, rgba(0xFFA3CE27));
-
-		dcw.fill({
-				vec2(-0.500f, -0.866f) * s + vec2(h, 0.0f),
-				vec2( 0.366f, -0.366f) * s + vec2(h, 0.0f),
-				vec2( 0.000f, -0.000f) * s + vec2(h, 0.0f),
-				vec2(-0.500f, -0.500f) * s + vec2(h, 0.0f)
-			}, rgba(0xFFA3CE27));
-	}
-
-	// red 0xFFE52B60
-	// green 0xFFA3CE27
-	// dark green 0xFF7A991D
-	// purple 0xFF5026CC
-	dcw.shape(vec2(0.0f, 0.0f), 4, s * 0.25f, 0.0f, rgba(0xFF7A991D));
-#endif
-}
-
 void game_frame(vec2i view_size) {
 	g_dl_world.reset();
 	g_dl_ui.reset();
@@ -163,13 +71,7 @@ void game_frame(vec2i view_size) {
 	draw_context dc_ui(g_dl_ui);
 
 	world_tick(&g_world);
-
 	world_draw(&dc, &g_world);
-
-	float static t;
-	t += 0.03f;
-
-	recurse(dc.copy().translate(-100.0f, 0.0f), 7, t);
 
 	gpu_set_pipeline(g_pipeline_sprite);
 	gpu_set_const(0, top_down_proj_view(vec2(), 90.0f, (float)view_size.x / (float)view_size.y, 360.0f, 1.0f, 1000.0f));

@@ -78,7 +78,7 @@ struct draw_context {
 
 	draw_context& translate(float x, float y) { return push(::translate(vec3(x, y, 0.0f))); }
 	draw_context& rotate_z(float x) { return push(::rotate_z(x)); }
-	draw_context& scale(float x, float y) { return push(::scale(vec3(x, y, 1.0f))); }
+	draw_context& scale(float x) { return push(::scale(vec3(x, x, 1.0f))); }
 
 	void vert(float x, float y, float u, float v, float r, float g, float b, float a) const;
 	void vert(float x, float y, float r, float g, float b, float a) const;

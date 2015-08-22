@@ -11,5 +11,4 @@ void player_body::tick(int move_clipped) {
 }
 
 void player_body::draw(draw_context* dc) {
-	dc->shape(vec2(), 32, _radius, 0.0f, rgba());
 }

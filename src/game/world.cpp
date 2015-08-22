@@ -56,8 +56,7 @@ void entity_update(entity* e) {
 }
 
 void entity_render(draw_context* dc, entity* e) {
-	draw_context dcc = dc->copy().push(translate(vec3(e->_pos, 0.0f))).push(rotate_z(e->_rot));
-	e->draw(&dcc);
+	e->draw(&dc->copy());
 }
 
 void world_tick(world* w) {
