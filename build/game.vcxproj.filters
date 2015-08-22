@@ -116,6 +116,12 @@
     <ClCompile Include="..\src\sys\sound.cpp">
       <Filter>sys</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\game\player.cpp">
+      <Filter>game</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\game\player_body.cpp">
+      <Filter>game</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\shaders\fs_blur_x.hlsl">

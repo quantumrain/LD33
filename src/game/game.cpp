@@ -57,6 +57,8 @@ void game_init() {
 	init_sound();
 	define_sound(sfx::DIT, "dit", 2, 2);
 	finalise_sound();
+
+	spawn_entity(&g_world, new player);
 }
 
 void recurse(draw_context dcc, int i, float t) {
@@ -160,14 +162,14 @@ void game_frame(vec2i view_size) {
 	draw_context dc(g_dl_world);
 	draw_context dc_ui(g_dl_ui);
 
+	world_tick(&g_world);
+
+	world_draw(&dc, &g_world);
+
 	float static t;
 	t += 0.03f;
 
-	{
-		draw_context dcc = dc.copy();
-
-		recurse(dcc, 7, t);
-	}
+	recurse(dc.copy().translate(-100.0f, 0.0f), 7, t);
 
 	gpu_set_pipeline(g_pipeline_sprite);
 	gpu_set_const(0, top_down_proj_view(vec2(), 90.0f, (float)view_size.x / (float)view_size.y, 360.0f, 1.0f, 1000.0f));
