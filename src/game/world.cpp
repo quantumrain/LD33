@@ -23,7 +23,12 @@ entity::entity(entity_type type) : _world(), _flags(), _type(type), _rot(0.0f), 
 entity::~entity() { }
 void entity::init() { }
 void entity::tick(int move_clipped) { }
-void entity::draw(draw_context* dc) { dc->rect(-vec2(_radius), vec2(_radius), rgba()); }
+
+void entity::draw(draw_context* dc) {
+	dc->translate(_pos.x, _pos.y);
+	dc->rotate_z(_rot);
+	dc->shape_outline(vec2(), 16, _radius, _rot, 0.5f, rgba());
+}
 
 // etc
 

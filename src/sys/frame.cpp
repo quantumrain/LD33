@@ -3,6 +3,14 @@
 #include "render.h"
 #include "sound.h"
 
+#define USE_AA 1
+
+#if USE_AA
+#define AA_VIEW_SCALE 2
+#else
+#define AA_VIEW_SCALE 1
+#endif
+
 void game_frame(vec2i view_size);
 void init_fullscreen_quad();
 void init_font();
@@ -11,8 +19,8 @@ void render_debug_draw(vec2i view_size);
 
 random g_render_rand(1);
 
+texture g_aa_reduce_target;
 texture g_draw_target;
-texture g_depth_target;
 texture g_texture_white;
 texture g_sheet;
 
@@ -34,8 +42,13 @@ void frame_init() {
 }
 
 void frame_init_view(vec2i view_size) {
-	g_draw_target  = gpu_discard_on_reset(gpu_create_texture(view_size.x, view_size.y, gpu_format::RGBA_SRGB, gpu_bind::SHADER | gpu_bind::RENDER_TARGET, 0));
-	g_depth_target = gpu_discard_on_reset(gpu_create_texture(view_size.x, view_size.y, gpu_format::D24S8, gpu_bind::DEPTH_STENCIL, 0));
+	g_draw_target = gpu_discard_on_reset(gpu_create_texture(view_size.x * AA_VIEW_SCALE, view_size.y * AA_VIEW_SCALE, gpu_format::RGBA_SRGB, gpu_bind::SHADER | gpu_bind::RENDER_TARGET, 0));
+
+#if USE_AA
+	g_aa_reduce_target = gpu_discard_on_reset(gpu_create_texture(view_size.x, view_size.y, gpu_format::RGBA_SRGB, gpu_bind::SHADER | gpu_bind::RENDER_TARGET, 0));
+#else
+	g_aa_reduce_target = g_draw_target;
+#endif
 
 	g_bloom_fx.init_view(view_size);
 }
@@ -46,15 +59,25 @@ void frame_render(vec2i view_size) {
 	// clear
 
 	gpu_clear(g_draw_target, rgba(0.0f));
-	gpu_clear(g_depth_target, rgba(1.0f));
 
 	// game + bloom
 
-	gpu_set_render_target(g_draw_target, g_depth_target);
-	gpu_set_viewport(vec2i(0, 0), view_size, vec2(0.0f, 1.0f));
+	gpu_set_render_target(g_draw_target, 0);
+	gpu_set_viewport(vec2i(0, 0), view_size * AA_VIEW_SCALE, vec2(0.0f, 1.0f));
 
 	game_frame(view_size);
-	g_bloom_fx.render(g_draw_target);
+
+#if USE_AA
+	{
+		gpu_set_samplers({ g_sampler_linear_clamp });
+		gpu_set_viewport(vec2i(), view_size, vec2(0.0f, 1.0f));
+		gpu_set_render_target(g_aa_reduce_target, 0);
+		gpu_set_textures({ g_draw_target });
+		draw_fullscreen_quad(g_pipeline_bloom_reduce);
+	}
+#endif
+
+	g_bloom_fx.render(g_aa_reduce_target);
 
 	// combine
 
@@ -63,7 +86,7 @@ void frame_render(vec2i view_size) {
 
 	gpu_set_samplers({ g_sampler_point_clamp, g_sampler_linear_clamp });
 
-	texture_group tg { g_draw_target };
+	texture_group tg { g_aa_reduce_target };
 	g_bloom_fx.set_textures(&tg, 1);
 	gpu_set_textures(tg);
 

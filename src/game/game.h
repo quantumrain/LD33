@@ -67,6 +67,8 @@ struct player_body : entity {
 	virtual void draw(draw_context* dc);
 
 	player* _head;
+	float _render_radius;
+	int _index;
 };
 
 entity* spawn_entity(world* w, entity* e);
