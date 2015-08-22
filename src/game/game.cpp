@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "game.h"
 
-const wchar_t* g_win_name = L"LD33 - Base Code";
+const wchar_t* g_win_name = L"LD33 - You are the Monster";
 
 world g_world;
 
@@ -25,6 +25,9 @@ void game_frame(vec2i view_size) {
 
 	if (g_input.start)
 		sound_play(sfx::DIT);
+
+	draw_context dc(g_dl_world);
+	draw_context dc_ui(g_dl_ui);
 
 	{
 		draw_context dcc = dc.copy().set(g_sheet);
