@@ -149,8 +149,9 @@ void player::tick(int move_clipped) {
 	}
 
 	g_snake_wriggle += 0.2f * move_length;
+	float move_wriggle_scale = (0.65f + cosf(g_snake_wriggle) * 0.35f);
 	_vel *= 0.8f;
-	_vel += move_delta * 64.0f * (0.65f + cosf(g_snake_wriggle) * 0.35f); // slightly different to standard wiggle
+	_vel += move_delta * 64.0f * move_wriggle_scale; // slightly different to standard wiggle
 
 	if (_body.size() < MAX_LENGTH) {
 		new_body_segment();
@@ -232,10 +233,11 @@ void player::tick(int move_clipped) {
 			grind_lim += (100.0f - grind_lim) * 0.2f;
 
 		float grind_vol		= -15.0f - clamp(powf(150.0f, 5.0f) / (powf(move_sum, 5.0f) + 0.1f), grind_lim, 1000.0f);
-		float grind2_vol	= -10.0f - clamp(3000000.0f / (square(square(move_sum)) + 0.1f), 10.0f, 30.0f);
-		float grind3_vol	= -10.0f - clamp(powf(150.0f, 5.0f) / (powf(move_sum, 5.0f) + 0.1f), 15.0f, 1000.0f);
+		float grind2_vol	= -5.0f - clamp(3000000.0f / (square(square(move_sum)) + 0.1f), 10.0f, 30.0f);
+		float grind3_vol	= -5.0f - clamp(powf(150.0f, 5.0f) / (powf(move_sum, 5.0f) + 0.1f), 10.0f, 1000.0f);
 
-		grind2_vol -= (1.0f - clamp(square(grind_vol) / 5000.0f, 0.0f, 1.0f)) * 30.0f;
+		float grind_wriggle_scale = clamp(0.5f + cosf(g_snake_wriggle) * 0.65f, 0.0f, 1.0f);
+		grind2_vol -= (clamp((move_sum - 40.0f) / 50.0f, 0.0f, 1.0f) * grind_wriggle_scale) * 30.0f;
 
 		extern voice_id g_sound_grind;
 		extern voice_id g_sound_grind2;

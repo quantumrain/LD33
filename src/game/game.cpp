@@ -41,7 +41,7 @@ void game_init() {
 	sound_play(sfx::WIND, -10.0f, 2.0f, SOUND_LOOP);
 	g_sound_grind = sound_play(sfx::GRIND, 0.0f, -1000.0f, SOUND_LOOP);
 	g_sound_grind2 = sound_play(sfx::GRIND2, -10.0f, -1000.0f, SOUND_LOOP);
-	g_sound_grind3 = sound_play(sfx::GRIND2, 10.0f, -1000.0f, SOUND_LOOP);
+	g_sound_grind3 = sound_play(sfx::GRIND2, -20.0f, -1000.0f, SOUND_LOOP);
 
 	spawn_entity(&g_world, new player);
 }
