@@ -133,6 +133,12 @@ void draw_tile(const draw_context& dc, vec2 c, float s, rgba col, int tile_num, 
 void draw_tile(const draw_context& dc, vec2 p0, vec2 p1, rgba col, int tile_num, int flags);
 void draw_tile(const draw_context& dc, vec2 p0, vec2 p1, rgba c0, rgba c1, rgba c2, rgba c3, int tile_num, int flags);
 
+void draw_tex_tile(const draw_context& dc, vec2 p0, vec2 p1, vec2 p2, vec2 p3, rgba c0, rgba c1, rgba c2, rgba c3, texture t, int flags);
+void draw_tex_tile(const draw_context& dc, vec2 c, float s, float rot, rgba col, texture t, int flags);
+void draw_tex_tile(const draw_context& dc, vec2 c, float s, rgba col, texture t, int flags);
+void draw_tex_tile(const draw_context& dc, vec2 p0, vec2 p1, rgba col, texture t, int flags);
+void draw_tex_tile(const draw_context& dc, vec2 p0, vec2 p1, rgba c0, rgba c1, rgba c2, rgba c3, texture t, int flags);
+
 void draw_fullscreen_quad(pipeline pl);
 
 enum font_flags {

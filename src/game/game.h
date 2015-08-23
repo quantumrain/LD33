@@ -14,7 +14,8 @@ struct player;
 struct player_body;
 
 enum entity_flag {
-	EF_DESTROYED = 0x1
+	EF_DESTROYED = 0x1,
+	EF_NO_PHYSICS = 0x2
 };
 
 enum entity_type {
@@ -25,9 +26,15 @@ enum entity_type {
 struct world {
 	random r;
 
+	player* player;
+
 	list<entity> entities;
 
+	mat44 proj, view, proj_view;
+
 	world();
+
+	vec2 camera_pos;
 };
 
 struct entity {
@@ -51,6 +58,8 @@ struct entity {
 
 struct player : entity {
 	player();
+
+	void new_body_segment();
 
 	virtual void init();
 	virtual void tick(int move_clipped);

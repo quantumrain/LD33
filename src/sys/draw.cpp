@@ -393,6 +393,86 @@ void draw_tile(const draw_context& dc, vec2 p0, vec2 p1, rgba c0, rgba c1, rgba 
 	draw_tile(dc, p0, vec2(p1.x, p0.y), vec2(p0.x, p1.y), p1, c0, c1, c2, c3, tile_num, flags);
 }
 
+void draw_tex_tile(const draw_context& dc, vec2 p0, vec2 p1, vec2 p2, vec2 p3, rgba c0, rgba c1, rgba c2, rgba c3, texture t, int flags) {
+	vec2 uv0;
+	vec2 uv1;
+	vec2 uv2;
+	vec2 uv3;
+
+	float a = 0.0f;
+	float b = 1.0f;
+
+	if ((flags & 1) == 0) {
+		
+		uv0 = vec2(a, a);
+		uv1 = vec2(b, a);
+		uv2 = vec2(a, b);
+		uv3 = vec2(b, b);
+	} else {
+		uv0 = vec2(a, b);
+		uv1 = vec2(a, a);
+		uv2 = vec2(b, b);
+		uv3 = vec2(b, a);
+	}
+
+	if (flags & 2) {
+		swap(uv0, uv2);
+		swap(uv1, uv3);
+		swap(uv0, uv1);
+		swap(uv2, uv3);
+	}
+
+	if (flags & DT_FLIP_X) {
+		swap(uv0, uv1);
+		swap(uv2, uv3);
+	}
+
+	if (flags & DT_FLIP_Y) {
+		swap(uv0, uv2);
+		swap(uv1, uv3);
+	}
+
+	if (flags & DT_ALT_TRI) {
+		dc.vert(p0, uv0, c0);
+		dc.vert(p3, uv3, c3);
+		dc.vert(p1, uv1, c1);
+
+		dc.vert(p0, uv0, c0);
+		dc.vert(p2, uv2, c2);
+		dc.vert(p3, uv3, c3);
+	}
+	else {
+		dc.vert(p0, uv0, c0);
+		dc.vert(p2, uv2, c2);
+		dc.vert(p1, uv1, c1);
+
+		dc.vert(p1, uv1, c1);
+		dc.vert(p2, uv2, c2);
+		dc.vert(p3, uv3, c3);
+	}
+}
+
+void draw_tex_tile(const draw_context& dc, vec2 c, float s, float rot, rgba col, texture t, int flags) {
+	vec2 cx(cosf(rot) * s * 0.5f, sinf(rot) * s * 0.5f);
+	vec2 cy(perp(cx));
+	draw_tex_tile(dc, c - cx - cy, c + cx - cy, c - cx + cy, c + cx + cy, col, col, col, col, t, flags);
+}
+
+void draw_tex_tile(const draw_context& dc, vec2 c, float s, rgba col, texture t, int flags) {
+	vec2 cx(s, 0.0f);
+	vec2 cy(0.0f, s);
+	draw_tex_tile(dc, c - cx - cy, c + cx - cy, c - cx + cy, c + cx + cy, col, col, col, col, t, flags);
+}
+
+void draw_tex_tile(const draw_context& dc, vec2 p0, vec2 p1, rgba col, texture t, int flags) {
+	draw_tex_tile(dc, p0, vec2(p1.x, p0.y), vec2(p0.x, p1.y), p1, col, col, col, col, t, flags);
+}
+
+void draw_tex_tile(const draw_context& dc, vec2 p0, vec2 p1, rgba c0, rgba c1, rgba c2, rgba c3, texture t, int flags) {
+	draw_tex_tile(dc, p0, vec2(p1.x, p0.y), vec2(p0.x, p1.y), p1, c0, c1, c2, c3, t, flags);
+}
+
+
 // fullscreen quad
 
 vertex_buffer g_vb_fullscreen_quad;

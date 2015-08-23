@@ -143,6 +143,18 @@ inline vec2 normalise(const vec2& v) { return v * vec2(1.0f / length(v)); }
 inline vec3 normalise(const vec3& v) { return v * vec3(1.0f / length(v)); }
 inline vec4 normalise(const vec4& v) { return v * vec4(1.0f / length(v)); }
 
+inline vec2 reflect(const vec2& v, const vec2& norm) { return v - norm * (dot(v, norm) * 2.0f); }
+inline vec3 reflect(const vec3& v, const vec3& norm) { return v - norm * (dot(v, norm) * 2.0f); }
+inline vec4 reflect(const vec4& v, const vec4& norm) { return v - norm * (dot(v, norm) * 2.0f); }
+
+inline vec2 project_onto(const vec2& v, const vec2& axis) { return axis * dot(v, axis); }
+inline vec3 project_onto(const vec3& v, const vec3& axis) { return axis * dot(v, axis); }
+inline vec4 project_onto(const vec4& v, const vec4& axis) { return axis * dot(v, axis); }
+
+inline vec2 cancel(const vec2& v, const vec2& axis) { return v - axis * dot(v, axis); }
+inline vec3 cancel(const vec3& v, const vec3& axis) { return v - axis * dot(v, axis); }
+inline vec4 cancel(const vec4& v, const vec4& axis) { return v - axis * dot(v, axis); }
+
 inline vec2 perp(const vec2& v) { return vec2(-v.y, v.x); }
 inline float cross(const vec2& v0, const vec2& v1) { return v0.x * v1.y - v1.x * v0.y; }
 inline vec3 cross(const vec3& v0, const vec3& v1) { return vec3(v0.y * v1.z - v1.y * v0.z, v0.z * v1.x - v1.z * v0.x, v0.x * v1.y - v1.x * v0.y); }
