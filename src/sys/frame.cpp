@@ -65,7 +65,7 @@ void frame_render(vec2i view_size) {
 
 	// clear
 
-	gpu_clear(g_draw_target, rgba(0.035f));
+	gpu_clear(g_draw_target, rgba(0.0f));
 
 	// game + bloom
 

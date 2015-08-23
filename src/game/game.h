@@ -8,6 +8,11 @@
 
 #define DT (1.0f / 60.0f)
 
+enum tile_type {
+	TILE_EMPTY,
+	TILE_WALL
+};
+
 struct world;
 struct entity;
 struct player;
@@ -20,7 +25,8 @@ enum entity_flag {
 
 enum entity_type {
 	ET_PLAYER,
-	ET_PLAYER_BODY
+	ET_PLAYER_BODY,
+	ET_FARMER
 };
 
 struct world {
@@ -31,6 +37,8 @@ struct world {
 	list<entity> entities;
 
 	mat44 proj, view, proj_view;
+
+	tile_map map;
 
 	world();
 
@@ -45,9 +53,13 @@ struct entity {
 	virtual void tick(int move_clipped);
 	virtual void draw(draw_context* dc);
 
+	void set_pos(vec2 p);
+	void set_radius(float r);
+
 	world*	_world;
 	u16		_flags;
 	u16		_type;
+	aabb2	_bb;
 	vec2	_pos;
 	vec2	_old_pos;
 	vec2	_vel;
@@ -80,8 +92,26 @@ struct player_body : entity {
 	int _index;
 };
 
+struct farmer : entity {
+	farmer();
+
+	virtual void init();
+	virtual void tick(int move_clipped);
+	virtual void draw(draw_context* dc);
+
+	int _fleeing;
+	int _waiting;
+	vec2 _home;
+	bool _set_home;
+};
+
 entity* spawn_entity(world* w, entity* e);
 void destroy_entity(entity* e);
+
+void entity_update(entity* e);
+void entity_render(draw_context* dc, entity* e);
+
+int move_entity(entity* e, vec2 new_pos);
 
 template<typename T> T* spawn_entity(world* w, T* e) { return (T*)spawn_entity(w, static_cast<entity*>(e)); }
 
@@ -90,5 +120,9 @@ void world_draw(draw_context* dc, world* w);
 
 extern texture g_tree2;
 extern texture g_ground;
+extern texture g_rock;
+extern texture g_house;
+extern texture g_field;
+extern texture g_farmer;
 
 #endif // GAME_H

@@ -43,22 +43,37 @@ void avoid_player(world* w, entity* self) {
 }
 
 player::player() : entity(ET_PLAYER) {
-	_radius = 12.0f;
-	_pos = vec2(100.0f, 0.0);
+	set_radius(12.0f);
+	set_pos(vec2(200.0f, 200.0f));
 }
 
 void player::new_body_segment() {
 	player_body** new_body = _body.push_back(spawn_entity(_world, new player_body(this)));
-	(*new_body)->_pos = _pos + _world->r.range(vec2(1.0f));
+	(*new_body)->set_pos(_pos + _world->r.range(vec2(1.0f)));
 }
 
 void player::init() {
-	new_body_segment();
+	const int MAX_LENGTH = 16;
+
+	for(int i = 0; i < MAX_LENGTH; i++)
+		new_body_segment();
+
+	for(int seg = 0; seg < _body.size(); seg++) {
+		player_body* b = _body[seg];
+
+		b->_index = seg;
+		
+		float seg_f = 1.0f - (seg / (MAX_LENGTH - 1.0f));
+		b->_render_radius = lerp(5.0f, 50.0f, square(seg_f)) * lerp(1.0f, 0.15f, square(seg_f));
+
+		if (seg == 0)
+			b->_render_radius *= 1.3f;
+
+		b->set_radius(b->_render_radius * 0.33f);
+	}
 }
 
 void player::tick(int move_clipped) {
-	const int MAX_LENGTH = 16;
-
 	// input
 
 	vec2 pad_left = g_input.pad_left;
@@ -134,7 +149,7 @@ void player::tick(int move_clipped) {
 				}
 
 				player_body* front = _body.front();
-				_pos = front->_pos + attack_dir * front->_render_radius;
+				move_entity(this, front->_pos + attack_dir * front->_render_radius);
 			}
 		}
 		else if (attack_frame < 15) {
@@ -152,24 +167,6 @@ void player::tick(int move_clipped) {
 	float move_wriggle_scale = (0.65f + cosf(g_snake_wriggle) * 0.35f);
 	_vel *= 0.8f;
 	_vel += move_delta * 64.0f * move_wriggle_scale; // slightly different to standard wiggle
-
-	if (_body.size() < MAX_LENGTH) {
-		new_body_segment();
-	}
-
-	for(int seg = 0; seg < _body.size(); seg++) {
-		player_body* b = _body[seg];
-
-		b->_index = seg;
-
-		float seg_f = 1.0f - (seg / (MAX_LENGTH - 1.0f));
-		b->_render_radius = lerp(5.0f, 50.0f, square(seg_f)) * lerp(1.0f, 0.15f, square(seg_f));
-
-		if (seg == 0)
-			b->_render_radius *= 1.3f;
-
-		b->_radius = b->_render_radius * 0.33f;
-	}
 
 	if (_body.not_empty()) {
 		player_body* front = _body.front();

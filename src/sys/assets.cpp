@@ -91,7 +91,7 @@ texture load_texture(const char* name) {
 		return 0;
 	}
 
-	texture t = gpu_create_texture(width, height, gpu_format::RGBA, gpu_bind::SHADER, data);
+	texture t = gpu_create_texture(width, height, gpu_format::RGBA, gpu_bind::SHADER, data); // TODO: should be srgb
 
 	free(data);
 

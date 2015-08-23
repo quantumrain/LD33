@@ -115,10 +115,10 @@ namespace {
 aabb2 tile_map::slide(aabb2 self, vec2 delta, int* clipped) {
 	aabb2 bounds(expand_toward(self, delta));
 
-	int x0 = ifloor(bounds.min.x);
-	int y0 = ifloor(bounds.min.y);
-	int x1 = ifloor(bounds.max.x);
-	int y1 = ifloor(bounds.max.y);
+	int x0 = ifloor(bounds.min.x / 5.0f);
+	int y0 = ifloor(bounds.min.y / 5.0f);
+	int x1 = ifloor(bounds.max.x / 5.0f);
+	int y1 = ifloor(bounds.max.y / 5.0f);
 
 	float dx = slide_t<clip_x>(this, x0, y0, x1, y1, self, delta.x);
 
@@ -165,5 +165,5 @@ bool tile_map::is_slide_solid(int x, int y) {
 }
 
 aabb2 tile_map::get_tile_bb(int x, int y) {
-	return aabb2 { { (float)x, (float)y }, { x + 1.0f, y + 1.0f } };
+	return aabb2 { { x * 5.0f, y * 5.0f }, { x * 5.0f + 5.0f, y * 5.0f + 5.0f } };
 }

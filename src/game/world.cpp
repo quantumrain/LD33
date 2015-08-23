@@ -1,6 +1,11 @@
 #include "pch.h"
 #include "game.h"
 
+extern array<vec2> g_rocks;
+extern array<vec2> g_trees;
+extern array<vec2> g_houses;
+extern array<vec2> g_fields;
+
 template<typename C, typename F> void for_all(C& c, F&& f) {
 	for(int i = 0; i < c.size(); i++) {
 		if (!(c[i]->_flags & EF_DESTROYED)) f(c[i]);
@@ -13,61 +18,7 @@ template<typename C> void prune(C& c) {
 	}
 }
 
-// world
-
 world::world() : player() { }
-
-// entity
-
-entity::entity(entity_type type) : _world(), _flags(), _type(type), _rot(0.0f), _radius(8.0f) { }
-entity::~entity() { }
-void entity::init() { }
-void entity::tick(int move_clipped) { }
-
-void entity::draw(draw_context* dc) {
-	dc->translate(_pos.x, _pos.y);
-	dc->rotate_z(_rot);
-	dc->shape_outline(vec2(), 16, _radius, _rot, 0.5f, rgba());
-}
-
-// etc
-
-entity* spawn_entity(world* w, entity* e) {
-	if (e) {
-		if (e->_type == ET_PLAYER)
-			w->player = (player*)e;
-
-		e->_world = w;
-		w->entities.push_back(e);
-		e->init();
-	}
-
-	return e;
-}
-
-void destroy_entity(entity* e) {
-	if (e) {
-		e->_flags |= EF_DESTROYED;
-	}
-}
-
-void entity_update(entity* e) {
-	if (e->_flags & EF_DESTROYED)
-		return;
-
-	int clipped = 0;
-
-	if (!(e->_flags & EF_NO_PHYSICS)) {
-		e->_old_pos = e->_pos;
-		e->_pos += e->_vel * (1.0f / 60.0f);
-	}
-
-	e->tick(clipped);
-}
-
-void entity_render(draw_context* dc, entity* e) {
-	e->draw(&dc->copy());
-}
 
 void world_tick(world* w) {
 
@@ -137,9 +88,11 @@ void world_draw(draw_context* dc, world* w) {
 	t_wind += 0.025f;
 	float f_wind = cosf(t_wind) * 0.01f;
 
+	dcc.rect({ 20.0f * 5.0f }, { (512.0f - 20.0f) * 5.0f }, rgba(0.2f));
+
 	dcc.set(g_ground);
-	for(int x = -10; x < 10; x++) {
-		for(int y = -10; y < 10; y++) {
+	for(int x = 1; x < 17; x++) {
+		for(int y = 1; y < 17; y++) {
 			vec2 c(x * 150.0f, y * 150.0f);
 			for(int i = 0; i < 5; i++) {
 				vec2 p = c + r.range(vec2(50.0f));
@@ -151,24 +104,64 @@ void world_draw(draw_context* dc, world* w) {
 		}
 	}
 
+	dcc.set(g_field);
+
+	for(auto& c : g_fields) {
+		draw_tex_tile(dcc, c, 400.0f, 0.0f, rgba(0.25f, 1.0f), 0);
+	}
 
 	for_all(w->entities, [dc](entity* e) { entity_render(dc, e); });
 
+	dcc.set(g_rock);
+
+	random rr(100);
+	for(auto& rock : g_rocks) {
+		draw_tex_tile(dcc, rock, 190.0f, rr.range(PI), rgba(1.0f), 0);
+	}
+
+	dcc.set(g_house);
+
+	for(auto& c : g_houses) {
+		draw_tex_tile(dcc, c, 256.0f, r.range(0.1f), rgba(0.25f, 1.0f), 0);
+	}
+
 	dcc.set(g_tree2);
 
-	for(int x = -10; x < 10; x+=2) {
-		for(int y = -10; y < 10; y+=2) {
-			vec2 c(x * 150.0f, y * 150.0f);
-
-			for(int i = 0; i < 1; i++) {
-				//dcc.rect(p - s, p + s, 0.0f, 1.0f, rgba(0.25f, 1.0f));
-
-				vec2 p = c + r.range(vec2(256.0f));
-				float s = r.range(200.0f, 400.0f);
-				float rot = r.range(PI);
-				float wind = r.range(0.5f, 1.0f) * f_wind;
+	for(auto& c : g_trees) {
+		float s = 300.0f;
+		float rot = r.range(PI);
+		float wind = r.range(0.5f, 1.0f) * f_wind;
 		
-				draw_tex_tile(dcc, p, s, rot + wind, rgba(0.25f, 1.0f), 0);
+		draw_tex_tile(dcc, c, s, rot + wind, rgba(0.25f, 1.0f), 0);
+	}
+
+	dcc.set(g_texture_white);
+	dcc.tri(vec2(0.0f, 0.0f), vec2(500, 0.0f), vec2(0.0f, 500.0f), rgba(0.0f, 1.0f), rgba(0.0f, 0.0f), rgba(0.0f, 0.0f));
+	dcc.tri(vec2(0.0f, 0.0f), vec2(600, 0.0f), vec2(0.0f, 600.0f), rgba(0.0f, 1.0f), rgba(0.0f, 0.0f), rgba(0.0f, 0.0f));
+	dcc.tri(vec2(0.0f, 0.0f), vec2(1000, 0.0f), vec2(0.0f, 1000.0f), rgba(0.0f, 1.0f), rgba(0.0f, 0.0f), rgba(0.0f, 0.0f));
+
+	static bool do_map;
+
+	if (is_key_pressed(KEY_DEBUG_STATS))
+		do_map = !do_map;
+
+	if (do_map) {
+		if (player* pl = w->player) {
+			vec2i ix((int)(pl->_pos.x / 5.0f), (int)(pl->_pos.y / 5.0f));
+
+			int x0 = clamp(ix.x - 60, 0, w->map._w - 1);
+			int x1 = clamp(ix.x + 60, 0, w->map._w - 1);
+			int y0 = clamp(ix.y - 40, 0, w->map._h - 1);
+			int y1 = clamp(ix.y + 40, 0, w->map._h - 1);
+
+			for(int y = y0; y < y1; y++) {
+				for(int x = x0; x < x1; x++) {
+					vec2 p(x, y);
+
+					if (w->map.is_slide_solid(x, y)) {
+						dc->rect(p * 5.0f, (p + 1.0f) * 5.0f, rgba(colours::FUCHSIA) * 0.25f);
+					}
+				}
 			}
 		}
 	}
