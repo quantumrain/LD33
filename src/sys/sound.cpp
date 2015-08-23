@@ -118,19 +118,19 @@ void sound_update() {
 	}
 }
 
-void sound_play(sfx s, float semitones, float decibels, int flags) {
+voice_id sound_play(sfx s, float semitones, float decibels, int flags) {
 	int si = g_sfx_map[(int)s] - 1;
 
 	if ((si < 0) || (si > g_sound_fx.size()))
-		return;
+		return 0;
 
 	sound_fx* fx = &g_sound_fx[si];
 
 	if (fx->cooldown > 0)
-		return;
+		return 0;
 
 	if (fx->variant.empty())
-		return;
+		return 0;
 
 	voice_fx* best = 0;
 	u64 best_played = 0;
@@ -157,6 +157,8 @@ void sound_play(sfx s, float semitones, float decibels, int flags) {
 		fx->cooldown		= fx->max_cooldown;
 		best->last_played	= timer_ticks();
 	}
+
+	return best->id;
 }
 
 void sound_stop(sfx s) {

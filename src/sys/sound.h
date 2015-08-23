@@ -2,6 +2,10 @@
 
 enum class sfx {
 	DIT,
+	RAIN,
+	WIND,
+	GRIND,
+	GRIND2,
 	_MAX
 };
 
@@ -11,5 +15,5 @@ void finalise_sound();
 
 void sound_update();
 
-void sound_play(sfx s, float semitones = 0.0f, float decibels = 0.0f, int flags = 0);
+voice_id sound_play(sfx s, float semitones = 0.0f, float decibels = 0.0f, int flags = 0);
 void sound_stop(sfx s);

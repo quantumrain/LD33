@@ -206,3 +206,27 @@ bool audio_is_playing(voice_id vid) {
 
 	return s.BuffersQueued != 0;
 }
+
+void audio_set_volume(voice_id vid, float decibels) {
+	if (!g_audio.device)
+		return;
+
+	if ((vid <= 0) || (vid > g_audio.voice.size()))
+		return;
+
+	audio_voice* v = &g_audio.voice[vid - 1];
+
+	v->p->SetVolume(powf(10.0f, decibels / 20.0f));
+}
+
+void audio_set_frequency(voice_id vid, float semitones) {
+	if (!g_audio.device)
+		return;
+
+	if ((vid <= 0) || (vid > g_audio.voice.size()))
+		return;
+
+	audio_voice* v = &g_audio.voice[vid - 1];
+
+	v->p->SetFrequencyRatio(powf(2.0f, semitones / 12.0f));
+}

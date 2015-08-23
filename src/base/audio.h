@@ -18,3 +18,6 @@ void audio_stop(voice_id sid);
 
 int audio_format(sound_id sid);
 bool audio_is_playing(voice_id vid);
+
+void audio_set_volume(voice_id vid, float decibels);
+void audio_set_frequency(voice_id vid, float semitones);

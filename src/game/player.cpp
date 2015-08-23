@@ -179,6 +179,8 @@ void player::tick(int move_clipped) {
 		static float anyway;
 		anyway += 0.01f;
 
+		float move_sum = 0.0f;
+
 		for(int seg = 0; seg < _body.size(); seg++) {
 			player_body* b = _body[seg];
 
@@ -213,10 +215,35 @@ void player::tick(int move_clipped) {
 			b->_pos = lerp(b->_pos, actual_target, 0.9f);
 			b->_rot = rotation_of(dir);
 
+			move_sum += length(b->_pos - b->_old_pos);
+
 			avoid_player(_world, b);
 
 			target = b->_pos;
 		}
+
+		move_sum += length(_vel) * 0.1f;
+
+		static float grind_lim = 100.0f;
+
+		if (is_attacking)
+			grind_lim += (5.0f - grind_lim) * 0.5f;
+		else
+			grind_lim += (100.0f - grind_lim) * 0.2f;
+
+		float grind_vol		= -15.0f - clamp(powf(150.0f, 5.0f) / (powf(move_sum, 5.0f) + 0.1f), grind_lim, 1000.0f);
+		float grind2_vol	= -10.0f - clamp(3000000.0f / (square(square(move_sum)) + 0.1f), 10.0f, 30.0f);
+		float grind3_vol	= -10.0f - clamp(powf(150.0f, 5.0f) / (powf(move_sum, 5.0f) + 0.1f), 15.0f, 1000.0f);
+
+		grind2_vol -= (1.0f - clamp(square(grind_vol) / 5000.0f, 0.0f, 1.0f)) * 30.0f;
+
+		extern voice_id g_sound_grind;
+		extern voice_id g_sound_grind2;
+		extern voice_id g_sound_grind3;
+		audio_set_volume(g_sound_grind, grind_vol);
+		audio_set_volume(g_sound_grind2, grind2_vol);
+		audio_set_volume(g_sound_grind3, grind3_vol);
+		audio_set_frequency(g_sound_grind, (square(move_sum / 100.0f)) - 8.0f);
 
 		if (length_sq(move_delta) > 0.01f) {
 			if (length_sq(_pos - front->_pos) > 0.001f) {
