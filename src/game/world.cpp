@@ -128,8 +128,6 @@ void world_tick(world* w) {
 }
 
 void world_draw(draw_context* dc, world* w) {
-	static texture tree2 = load_texture("tree2");
-	static texture ground = load_texture("ground");
 
 	random r(100);
 
@@ -139,7 +137,7 @@ void world_draw(draw_context* dc, world* w) {
 	t_wind += 0.025f;
 	float f_wind = cosf(t_wind) * 0.01f;
 
-	dcc.set(ground);
+	dcc.set(g_ground);
 	for(int x = -10; x < 10; x++) {
 		for(int y = -10; y < 10; y++) {
 			vec2 c(x * 150.0f, y * 150.0f);
@@ -148,7 +146,7 @@ void world_draw(draw_context* dc, world* w) {
 				float s = r.range(120.0f, 200.0f);
 				float rot = r.range(PI);
 
-				draw_tex_tile(dcc, p, s, rot, rgba(r.range(0.3f, 0.5f), 1.0f), ground, 0);
+				draw_tex_tile(dcc, p, s, rot, rgba(r.range(0.3f, 0.5f), 1.0f), 0);
 			}
 		}
 	}
@@ -156,7 +154,7 @@ void world_draw(draw_context* dc, world* w) {
 
 	for_all(w->entities, [dc](entity* e) { entity_render(dc, e); });
 
-	dcc.set(tree2);
+	dcc.set(g_tree2);
 
 	for(int x = -10; x < 10; x+=2) {
 		for(int y = -10; y < 10; y+=2) {
@@ -170,7 +168,7 @@ void world_draw(draw_context* dc, world* w) {
 				float rot = r.range(PI);
 				float wind = r.range(0.5f, 1.0f) * f_wind;
 		
-				draw_tex_tile(dcc, p, s, rot + wind, rgba(0.25f, 1.0f), tree2, 0);
+				draw_tex_tile(dcc, p, s, rot + wind, rgba(0.25f, 1.0f), 0);
 			}
 		}
 	}

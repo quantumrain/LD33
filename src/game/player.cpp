@@ -90,7 +90,7 @@ void player::tick(int move_clipped) {
 	//
 
 	static bool is_attacking;
-	static bool attack_latch;
+	static bool attack_latch = true;
 	static int attack_frame;
 	static int attack_cooldown;
 	static vec2 attack_dir;

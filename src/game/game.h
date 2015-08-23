@@ -88,4 +88,7 @@ template<typename T> T* spawn_entity(world* w, T* e) { return (T*)spawn_entity(w
 void world_tick(world* w);
 void world_draw(draw_context* dc, world* w);
 
+extern texture g_tree2;
+extern texture g_ground;
+
 #endif // GAME_H

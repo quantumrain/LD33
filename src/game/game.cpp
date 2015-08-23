@@ -23,9 +23,17 @@ voice_id g_sound_grind;
 voice_id g_sound_grind2;
 voice_id g_sound_grind3;
 
+texture g_tree2;
+texture g_ground;
+
+bool g_in_menu = true;
+
 void game_init() {
 	g_dl_world.init(64 * 1024);
 	g_dl_ui.init(64 * 1024);
+
+	g_tree2 = load_texture("tree2");
+	g_ground = load_texture("ground");
 
 	init_sound();
 	define_sound(sfx::DIT, "dit", 2, 2);
@@ -60,12 +68,50 @@ void game_frame(vec2i view_size) {
 	g_dl_ui.reset();
 
 	g_request_mouse_capture = false;
+	g_hide_mouse_cursor = !g_in_menu;
 
 	draw_context dc(g_dl_world);
 	draw_context dc_ui(g_dl_ui);
 
-	world_tick(w);
-	world_draw(&dc, w);
+	if (g_in_menu) {
+		float y = 40.0f;
+		draw_string(dc_ui, vec2(320.0f, y), vec2(4.0f), TEXT_CENTRE | TEXT_VCENTRE, rgba(0.75f), "IN THE WOODS"); y += 28.0f;
+		draw_string(dc_ui, vec2(320.0f, y), vec2(1.5f), TEXT_CENTRE | TEXT_VCENTRE, rgba(0.5f), "By Stephen Cakebread"); y += 8.0f * 8.0f;
+
+		draw_string(dc_ui, vec2(320.0f, y), vec2(1.5f), TEXT_CENTRE | TEXT_VCENTRE, rgba(0.65f, 0.65f, 0.65f, 1.0f), "using an xbox 360 controller is highly recommended"); y += 4.0f * 8.0f;
+
+		float x0 = 320.0f - 140.0f;
+		float x1 = 320.0f + 140.0f;
+
+		rgba c0(0.5f);
+		rgba c(0.75f);
+
+		draw_string(dc_ui, vec2(320.0f, y), vec2(1.5f), TEXT_CENTRE, c0, "Xbox 360 Gamepad"); y += 15.0f;
+		draw_string(dc_ui, vec2(x0, y), vec2(1.5f), TEXT_LEFT, c, "Move");
+		draw_string(dc_ui, vec2(x1, y), vec2(1.5f), TEXT_RIGHT, c, "Left Stick"); y += 15.0f;
+		draw_string(dc_ui, vec2(x0, y), vec2(1.5f), TEXT_LEFT, c, "Action");
+		draw_string(dc_ui, vec2(x1, y), vec2(1.5f), TEXT_RIGHT, c, "A"); y += 15.0f;
+
+		y += 25.0f;
+
+		draw_string(dc_ui, vec2(320.0f, y), vec2(1.5f), TEXT_CENTRE, c0, "Keyboard"); y += 15.0f;
+		draw_string(dc_ui, vec2(x0, y), vec2(1.5f), TEXT_LEFT, c, "Move");
+		draw_stringf(dc_ui, vec2(x1, y), vec2(1.5f), TEXT_RIGHT, c, "%c%c%c%c or \001\002\003\004", g_input_key_w, g_input_key_a, g_input_key_s, g_input_key_d); y += 15.0f;
+		draw_string(dc_ui, vec2(x0, y), vec2(1.5f), TEXT_LEFT, c, "Action");
+		draw_string(dc_ui, vec2(x1, y), vec2(1.5f), TEXT_RIGHT, c, "Space or Enter"); y += 15.0f;
+
+		y += 4.0f * 8.0f;
+
+		draw_string(dc_ui, vec2(320.0f, y), vec2(1.5f), TEXT_CENTRE, c, "Press Action to Start");
+
+		if (g_input.start) {
+			g_in_menu = false;
+		}
+	}
+	else {
+		world_tick(w);
+		world_draw(&dc, w);
+	}
 
 	make_proj_view(w, -w->camera_pos, 90.0f, (float)view_size.x / (float)view_size.y, 360.0f, 1.0f, 1000.0f);
 

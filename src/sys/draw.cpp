@@ -393,7 +393,7 @@ void draw_tile(const draw_context& dc, vec2 p0, vec2 p1, rgba c0, rgba c1, rgba 
 	draw_tile(dc, p0, vec2(p1.x, p0.y), vec2(p0.x, p1.y), p1, c0, c1, c2, c3, tile_num, flags);
 }
 
-void draw_tex_tile(const draw_context& dc, vec2 p0, vec2 p1, vec2 p2, vec2 p3, rgba c0, rgba c1, rgba c2, rgba c3, texture t, int flags) {
+void draw_tex_tile(const draw_context& dc, vec2 p0, vec2 p1, vec2 p2, vec2 p3, rgba c0, rgba c1, rgba c2, rgba c3, int flags) {
 	vec2 uv0;
 	vec2 uv1;
 	vec2 uv2;
@@ -452,24 +452,24 @@ void draw_tex_tile(const draw_context& dc, vec2 p0, vec2 p1, vec2 p2, vec2 p3, r
 	}
 }
 
-void draw_tex_tile(const draw_context& dc, vec2 c, float s, float rot, rgba col, texture t, int flags) {
+void draw_tex_tile(const draw_context& dc, vec2 c, float s, float rot, rgba col, int flags) {
 	vec2 cx(cosf(rot) * s * 0.5f, sinf(rot) * s * 0.5f);
 	vec2 cy(perp(cx));
-	draw_tex_tile(dc, c - cx - cy, c + cx - cy, c - cx + cy, c + cx + cy, col, col, col, col, t, flags);
+	draw_tex_tile(dc, c - cx - cy, c + cx - cy, c - cx + cy, c + cx + cy, col, col, col, col, flags);
 }
 
-void draw_tex_tile(const draw_context& dc, vec2 c, float s, rgba col, texture t, int flags) {
+void draw_tex_tile(const draw_context& dc, vec2 c, float s, rgba col, int flags) {
 	vec2 cx(s, 0.0f);
 	vec2 cy(0.0f, s);
-	draw_tex_tile(dc, c - cx - cy, c + cx - cy, c - cx + cy, c + cx + cy, col, col, col, col, t, flags);
+	draw_tex_tile(dc, c - cx - cy, c + cx - cy, c - cx + cy, c + cx + cy, col, col, col, col, flags);
 }
 
-void draw_tex_tile(const draw_context& dc, vec2 p0, vec2 p1, rgba col, texture t, int flags) {
-	draw_tex_tile(dc, p0, vec2(p1.x, p0.y), vec2(p0.x, p1.y), p1, col, col, col, col, t, flags);
+void draw_tex_tile(const draw_context& dc, vec2 p0, vec2 p1, rgba col, int flags) {
+	draw_tex_tile(dc, p0, vec2(p1.x, p0.y), vec2(p0.x, p1.y), p1, col, col, col, col, flags);
 }
 
-void draw_tex_tile(const draw_context& dc, vec2 p0, vec2 p1, rgba c0, rgba c1, rgba c2, rgba c3, texture t, int flags) {
-	draw_tex_tile(dc, p0, vec2(p1.x, p0.y), vec2(p0.x, p1.y), p1, c0, c1, c2, c3, t, flags);
+void draw_tex_tile(const draw_context& dc, vec2 p0, vec2 p1, rgba c0, rgba c1, rgba c2, rgba c3, int flags) {
+	draw_tex_tile(dc, p0, vec2(p1.x, p0.y), vec2(p0.x, p1.y), p1, c0, c1, c2, c3, flags);
 }
 
 

@@ -12,6 +12,7 @@ enum class mouse_capture {
 
 bool g_request_mouse_capture = true;
 mouse_capture g_mouse_capture_state = mouse_capture::LOST;
+bool g_hide_mouse_cursor = true;
 
 extern const wchar_t* g_win_name;
 volatile bool g_win_quit = false;
@@ -32,6 +33,7 @@ void game_init();
 
 DWORD WINAPI game_thread_proc(void*) {
 	vec2i view_size = DEFAULT_VIEW_SIZE;
+	bool old_hide_mouse = g_hide_mouse_cursor;
 
 	while(!g_win_quit) {
 		// recreate buffers if window size changes
@@ -64,6 +66,11 @@ DWORD WINAPI game_thread_proc(void*) {
 				g_mouse_capture_state = mouse_capture::FREE;
 				SendMessage(g_win_hwnd, WM_APP_UPDATE_MOUSE_CURSOR, 0, 0);
 			}
+		}
+
+		if (old_hide_mouse != g_hide_mouse_cursor) {
+			old_hide_mouse = g_hide_mouse_cursor;
+			SendMessage(g_win_hwnd, WM_APP_UPDATE_MOUSE_CURSOR, 0, 0);
 		}
 
 		// update
@@ -156,21 +163,26 @@ LRESULT CALLBACK window_proc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam) 
 	switch(msg) {
 		// custom
 
-		case WM_APP_UPDATE_MOUSE_CURSOR:
+		case WM_APP_UPDATE_MOUSE_CURSOR: {
+			bool show = !g_hide_mouse_cursor;
+
 			if (g_mouse_capture_state == mouse_capture::CAPTURED) {
 				RECT rc;
 				GetClientRect(g_win_hwnd, &rc);
 				MapWindowPoints(g_win_hwnd, 0, (POINT*)&rc, 2);
 
 				ClipCursor(&rc);
-				ShowCursor(FALSE);
+				show = false;
 				SetCursor(0);
 			}
 			else {
 				ClipCursor(0);
-				ShowCursor(TRUE);
+				show = !g_hide_mouse_cursor;
 				SetCursor(LoadCursor(0, IDC_ARROW));
 			}
+
+			ShowCursor(show);
+		}
 		return 0;
 
 		// window interaction
@@ -197,7 +209,13 @@ LRESULT CALLBACK window_proc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam) 
 		case WM_KEYUP:
 		case WM_SYSKEYUP:
 		case WM_SYSKEYDOWN: {
-			input_key_event(wparam, !(lparam & 0x80000000));
+			bool send_key_to_game = true;
+
+			if ((lparam & 0x20000000) && (wparam == VK_SPACE))
+				send_key_to_game = false;
+
+			if (send_key_to_game)
+				input_key_event(wparam, !(lparam & 0x80000000));
 
 			if (!(lparam & 0xC0000000)) {
 				if (((wparam == 'F') && (GetKeyState(VK_CONTROL) & 0x8000)) ||
@@ -228,7 +246,7 @@ LRESULT CALLBACK window_proc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam) 
 
 		case WM_SETCURSOR:
 			if (LOWORD(lparam) == HTCLIENT) {
-				if (g_mouse_capture_state == mouse_capture::CAPTURED)
+				if ((g_mouse_capture_state == mouse_capture::CAPTURED) || g_hide_mouse_cursor)
 					SetCursor(0);
 				else
 					SetCursor(LoadCursor(0, IDC_ARROW));

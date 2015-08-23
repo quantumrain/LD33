@@ -88,7 +88,7 @@ void input_update() {
 
 	static bool last_start;
 
-	bool new_start	= is_key_down(KEY_FIRE) || (g_input.mouse_buttons & 1) || (g_input.pad_buttons & 1);
+	bool new_start	= is_key_down(KEY_FIRE) || (g_input.pad_buttons & 1);// || (g_input.mouse_buttons & 1);
 	g_input.start	= !last_start && new_start;
 	last_start		= new_start;
 }

@@ -34,6 +34,7 @@ struct input {
 };
 
 extern bool g_request_mouse_capture;
+extern bool g_hide_mouse_cursor;
 extern input g_input;
 extern int g_input_key_w;
 extern int g_input_key_a;
