@@ -1,17 +1,6 @@
 #include "pch.h"
 #include "game.h"
 
-/*
-
-	Herding game?
-
-		You are a monster
-		Herd children/whatever into your nest for your young to eat!
-		Easy general puzzles around that?
-		- Not that interesting though, and herding games always suck
-
-*/
-
 const wchar_t* g_win_name = L"LD33 - You are the Monster";
 
 world g_world;
@@ -24,18 +13,15 @@ voice_id g_sound_grind2;
 voice_id g_sound_grind3;
 
 texture g_tree2;
-texture g_house;
-texture g_field;
 texture g_ground;
 texture g_rock;
-texture g_farmer;
+texture g_heart;
 
 array<vec2> g_rocks;
 array<vec2> g_trees;
-array<vec2> g_houses;
-array<vec2> g_fields;
 
 bool g_in_menu = true;
+bool g_win_game;
 
 void game_init() {
 	world* w = &g_world;
@@ -44,11 +30,9 @@ void game_init() {
 	g_dl_ui.init(64 * 1024);
 
 	g_tree2 = load_texture("tree2");
-	g_house = load_texture("house");
-	g_field = load_texture("field");
 	g_ground = load_texture("ground");
 	g_rock = load_texture("rock");
-	g_farmer = load_texture("farmer");
+	g_heart = load_texture("heart");
 
 	init_sound();
 	define_sound(sfx::DIT, "dit", 2, 2);
@@ -56,7 +40,10 @@ void game_init() {
 	define_sound(sfx::WIND, "wind", 2, 0);
 	define_sound(sfx::GRIND, "grind3", 1, 0);
 	define_sound(sfx::GRIND2, "grind4", 2, 0);
+	define_sound(sfx::UNIT_EXPLODE, "unit_explode", 5, 2);
 	finalise_sound();
+
+	psys_init(10000);
 
 	//sound_play(sfx::RAIN, -64.0f, -20.0f, SOUND_LOOP);
 	//sound_play(sfx::RAIN, -56.0f, -18.0f, SOUND_LOOP);
@@ -97,12 +84,16 @@ void game_init() {
 					g_trees.push_back(p);
 				}
 
-				if (c == 0xFFFF00) {
-					g_houses.push_back(p);
+				if (c == 0xFF00FF) {
+					if (spinner* f = spawn_entity(w, new spinner)) {
+						f->set_pos(p);
+					}
 				}
 
 				if (c == 0x00FFFF) {
-					g_fields.push_back(p);
+					if (npc* f = spawn_entity(w, new npc)) {
+						f->set_pos(p);
+					}
 				}
 
 				if (c == 0x0000FF) {
@@ -143,7 +134,7 @@ void game_frame(vec2i view_size) {
 		draw_string(dc_ui, vec2(320.0f, y), vec2(4.0f), TEXT_CENTRE | TEXT_VCENTRE, rgba(0.75f), "IN THE WOODS"); y += 28.0f;
 		draw_string(dc_ui, vec2(320.0f, y), vec2(1.5f), TEXT_CENTRE | TEXT_VCENTRE, rgba(0.5f), "By Stephen Cakebread"); y += 7.0f * 8.0f;
 
-		draw_string(dc_ui, vec2(320.0f, y), vec2(1.5f), TEXT_CENTRE | TEXT_VCENTRE, rgba(0.65f, 0.65f, 0.65f, 1.0f), "using an xbox 360 controller is highly recommended"); y += 5.0f * 8.0f;
+		draw_string(dc_ui, vec2(320.0f, y), vec2(1.5f), TEXT_CENTRE | TEXT_VCENTRE, rgba(0.65f, 0.65f, 0.65f, 1.0f), "using an xbox 360 controller is recommended"); y += 5.0f * 8.0f;
 
 		float x0 = 320.0f - 140.0f;
 		float x1 = 320.0f + 140.0f;
@@ -178,6 +169,47 @@ void game_frame(vec2i view_size) {
 	else {
 		world_tick(w);
 		world_draw(&dc, w);
+	}
+
+	if (g_win_game) {
+		static float anim;
+		static float kill_timer;
+		static float wait;
+
+		wait += DT;
+
+		if (wait > 3.5f) {
+			anim += 0.8f;
+
+			if (anim < 1280.0f) {
+				if (anim > 80.0f) {
+					if (anim < 640.0f) {
+						anim *= 1.1f;
+					}
+					else {
+						anim += 2.0f;
+
+						if (anim > 720)
+							anim *= 1.05f;
+					}
+				}
+			}
+			else {
+				anim = 1280.0f;
+
+				if ((kill_timer += DT) > 5.0f) {
+					extern volatile bool g_win_quit;
+					g_win_quit = true;
+				}
+			}
+
+			dc_ui.set(g_heart);
+
+			draw_tex_tile(dc_ui, vec2(320.0f, 180.0f), anim, rgba(0.75f, 0.5f, 0.5f, 1.0f), 0);
+			draw_tex_tile(dc_ui, vec2(320.0f, 180.0f), max(anim - 640.0f, 0.0f), rgba(0.0f, 0.0f, 0.0f, 1.0f), 0);
+
+			draw_string(dc_ui, vec2(320.0f, 180.0f), vec2(max(anim - 640.0f, 0.0f) / 1280.0f) * 8.0f, TEXT_CENTRE | TEXT_VCENTRE, rgba(0.75f, 1.0f), "Thanks for playing!");
+		}
 	}
 
 	make_proj_view(w, -w->camera_pos, 90.0f, (float)view_size.x / (float)view_size.y, 360.0f, 1.0f, 1000.0f);

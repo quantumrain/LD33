@@ -177,8 +177,11 @@
     <ClCompile Include="..\src\game\entity.cpp" />
     <ClCompile Include="..\src\game\farmer.cpp" />
     <ClCompile Include="..\src\game\game.cpp" />
+    <ClCompile Include="..\src\game\npc.cpp" />
+    <ClCompile Include="..\src\game\particles.cpp" />
     <ClCompile Include="..\src\game\player.cpp" />
     <ClCompile Include="..\src\game\player_body.cpp" />
+    <ClCompile Include="..\src\game\spinner.cpp" />
     <ClCompile Include="..\src\game\tile_map.cpp" />
     <ClCompile Include="..\src\game\world.cpp" />
     <ClCompile Include="..\src\sys\assets.cpp" />

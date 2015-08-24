@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "game.h"
 
-player_body::player_body(player* head) : entity(ET_PLAYER_BODY), _head(head), _render_radius(1.0f), _index(0) {
+player_body::player_body() : entity(ET_PLAYER_BODY), _render_radius(1.0f), _index(0) {
 	_flags |= EF_NO_PHYSICS;
 }
 

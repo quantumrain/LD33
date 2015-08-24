@@ -42,13 +42,13 @@ void avoid_player(world* w, entity* self) {
 	}
 }
 
-player::player() : entity(ET_PLAYER) {
+player::player() : entity(ET_PLAYER), _dangerous(false) {
 	set_radius(12.0f);
 	set_pos(vec2(200.0f, 200.0f));
 }
 
 void player::new_body_segment() {
-	player_body** new_body = _body.push_back(spawn_entity(_world, new player_body(this)));
+	player_body** new_body = _body.push_back(spawn_entity(_world, new player_body));
 	(*new_body)->set_pos(_pos + _world->r.range(vec2(1.0f)));
 }
 
@@ -122,8 +122,12 @@ void player::tick(int move_clipped) {
 			attack_latch = true;
 			attack_frame = 0;
 			attack_cooldown = 30;
-			attack_dir = rotation(_body.front()->_rot);
 			attack_scale_flip = !attack_scale_flip;
+
+			if (length_sq(move_delta) > 0.1f)
+				attack_dir = normalise(move_delta);
+			else
+				attack_dir = rotation(_body.front()->_rot);
 		}
 	}
 	else
@@ -154,14 +158,20 @@ void player::tick(int move_clipped) {
 		}
 		else if (attack_frame < 15) {
 			_vel += attack_dir * 400.0f;
+			_dangerous = true;
 		}
 		else if (attack_frame < 25) {
 			//_vel -= attack_dir * 50.0f;
+			if (attack_frame > 20)
+				_dangerous = false;
+
 			input_scale_override = lerp(3.0f, 0.0f, (attack_frame - 15) / 10.0f);
 		}
 		else
 			is_attacking = false;
 	}
+	else
+		_dangerous = false;
 
 	g_snake_wriggle += 0.2f * move_length;
 	float move_wriggle_scale = (0.65f + cosf(g_snake_wriggle) * 0.35f);

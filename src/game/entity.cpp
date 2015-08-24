@@ -72,3 +72,80 @@ int move_entity(entity* e, vec2 new_pos) {
 
 	return clipped;
 }
+
+player* find_nearest_player(world* w, vec2 p) {
+	return w->player;
+}
+
+bool within(entity* a, entity* b, float d) {
+	return a && b && (length_sq(a->_pos - b->_pos) < square(d));
+}
+
+player* overlaps_player(entity* e) {
+	if (!e)
+		return 0;
+
+	player* p = find_nearest_player(e->_world, e->_pos);
+
+	if (!p)
+		return 0;
+
+	float d = e->_radius * 0.75f + p->_radius * 0.75f;
+
+	if (within(p, e, d))
+		return p;
+
+	return 0;
+}
+
+void interact_enemy_and_player(entity* e, rgba c) {
+	if (player* pl = overlaps_player(e)) {
+		if (pl->_dangerous) {
+			fx_explosion(e->_pos, 200.0f, 40, rgba(0.0f, 1.0f), 9.0f, 20);
+			fx_explosion(e->_pos, 300.0f, 10, c, 3.0f, 20);
+			fx_explosion(e->_pos, 300.0f, 50, rgba(0.0f, 1.0f), 6.0f, 30);
+			fx_explosion(e->_pos, 600.0f, 20, rgba(0.0f, 1.0f), 3.0f, 37);
+
+			sound_play(sfx::UNIT_EXPLODE, 0.0f, -10.0f);
+
+			vec2 d = normalise(pl->_pos - e->_pos);
+			pl->_vel *= 0.5f;
+			pl->_vel += d * 100.0f;
+			destroy_entity(e);
+		}
+	}
+}
+
+void avoid_enemy(world* w, entity* self) {
+	for(auto e : w->entities) {
+		if (e == self)
+			continue;
+
+		if (e->_flags & EF_DESTROYED)
+			continue;
+
+		if ((e->_type != ET_PLAYER_BODY) && (e->_type != ET_PLAYER))
+			continue;
+
+		vec2	d		= self->_pos - e->_pos;
+		float	min_l	= (self->_radius * 0.5f) + e->_radius;
+
+		if (length_sq(d) > square(min_l))
+			continue;
+
+		float l = length(d);
+
+		if (l < 0.0001f)
+			d = vec2(1.0f, 0.0f);
+		else
+			d /= l;
+
+		float force_self	= 32.0f;
+		float force_e		= 128.0f;
+
+		self->_vel += d * force_self;
+
+		if (e->_type != ET_PLAYER_BODY)
+			e->_vel -= d * force_e;
+	}
+}

@@ -6,6 +6,7 @@ enum class sfx {
 	WIND,
 	GRIND,
 	GRIND2,
+	UNIT_EXPLODE,
 	_MAX
 };
 

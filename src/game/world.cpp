@@ -69,6 +69,7 @@ void world_tick(world* w) {
 		}
 	}
 
+	psys_update();
 
 	// prune
 
@@ -104,12 +105,6 @@ void world_draw(draw_context* dc, world* w) {
 		}
 	}
 
-	dcc.set(g_field);
-
-	for(auto& c : g_fields) {
-		draw_tex_tile(dcc, c, 400.0f, 0.0f, rgba(0.25f, 1.0f), 0);
-	}
-
 	for_all(w->entities, [dc](entity* e) { entity_render(dc, e); });
 
 	dcc.set(g_rock);
@@ -119,11 +114,7 @@ void world_draw(draw_context* dc, world* w) {
 		draw_tex_tile(dcc, rock, 190.0f, rr.range(PI), rgba(1.0f), 0);
 	}
 
-	dcc.set(g_house);
-
-	for(auto& c : g_houses) {
-		draw_tex_tile(dcc, c, 256.0f, r.range(0.1f), rgba(0.25f, 1.0f), 0);
-	}
+	psys_render(&dc->copy());
 
 	dcc.set(g_tree2);
 

@@ -26,7 +26,9 @@ enum entity_flag {
 enum entity_type {
 	ET_PLAYER,
 	ET_PLAYER_BODY,
-	ET_FARMER
+	ET_FARMER,
+	ET_NPC,
+	ET_SPINNER
 };
 
 struct world {
@@ -78,16 +80,28 @@ struct player : entity {
 	virtual void draw(draw_context* dc);
 
 	array<player_body*> _body;
+	bool _dangerous;
 };
 
-struct player_body : entity {
-	player_body(player* head);
+struct npc : entity {
+	npc();
+
+	void new_body_segment();
 
 	virtual void init();
 	virtual void tick(int move_clipped);
 	virtual void draw(draw_context* dc);
 
-	player* _head;
+	array<player_body*> _body;
+};
+
+struct player_body : entity {
+	player_body();
+
+	virtual void init();
+	virtual void tick(int move_clipped);
+	virtual void draw(draw_context* dc);
+
 	float _render_radius;
 	int _index;
 };
@@ -99,10 +113,21 @@ struct farmer : entity {
 	virtual void tick(int move_clipped);
 	virtual void draw(draw_context* dc);
 
-	int _fleeing;
-	int _waiting;
 	vec2 _home;
 	bool _set_home;
+	float _t;
+};
+
+struct spinner : entity {
+	spinner();
+
+	virtual void init();
+	virtual void tick(int move_clipped);
+	virtual void draw(draw_context* dc);
+
+	vec2 _home;
+	bool _set_home;
+	float _t;
 };
 
 entity* spawn_entity(world* w, entity* e);
@@ -113,16 +138,25 @@ void entity_render(draw_context* dc, entity* e);
 
 int move_entity(entity* e, vec2 new_pos);
 
+player* overlaps_player(entity* e);
+
 template<typename T> T* spawn_entity(world* w, T* e) { return (T*)spawn_entity(w, static_cast<entity*>(e)); }
 
 void world_tick(world* w);
 void world_draw(draw_context* dc, world* w);
 
+void psys_init(int max_particles);
+void psys_update();
+void psys_render(draw_context* dc);
+void psys_spawn(vec2 pos, vec2 vel, float damp, float size0, float size1, float rot_v, rgba c0, rgba c1, int lifetime);
+void fx_explosion(vec2 pos, float strength, int count, rgba c, float p_size, int lifetime);
+
+void interact_enemy_and_player(entity* e, rgba c);
+void avoid_enemy(world* w, entity* self);
+
 extern texture g_tree2;
 extern texture g_ground;
 extern texture g_rock;
-extern texture g_house;
-extern texture g_field;
-extern texture g_farmer;
+extern texture g_heart;
 
 #endif // GAME_H
