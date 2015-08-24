@@ -127,7 +127,7 @@ void world_draw(draw_context* dc, world* w) {
 	}
 
 	dcc.set(g_texture_white);
-	dcc.tri(vec2(0.0f, 0.0f), vec2(500, 0.0f), vec2(0.0f, 500.0f), rgba(0.0f, 1.0f), rgba(0.0f, 0.0f), rgba(0.0f, 0.0f));
+	dcc.tri(vec2(0.0f, 0.0f), vec2(400, 0.0f), vec2(0.0f, 400.0f), rgba(0.0f, 1.0f), rgba(0.0f, 0.0f), rgba(0.0f, 0.0f));
 	dcc.tri(vec2(0.0f, 0.0f), vec2(600, 0.0f), vec2(0.0f, 600.0f), rgba(0.0f, 1.0f), rgba(0.0f, 0.0f), rgba(0.0f, 0.0f));
 	dcc.tri(vec2(0.0f, 0.0f), vec2(1000, 0.0f), vec2(0.0f, 1000.0f), rgba(0.0f, 1.0f), rgba(0.0f, 0.0f), rgba(0.0f, 0.0f));
 

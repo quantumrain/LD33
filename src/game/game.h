@@ -28,7 +28,8 @@ enum entity_type {
 	ET_PLAYER_BODY,
 	ET_FARMER,
 	ET_NPC,
-	ET_SPINNER
+	ET_SPINNER,
+	ET_LOOPER
 };
 
 struct world {
@@ -128,6 +129,19 @@ struct spinner : entity {
 	vec2 _home;
 	bool _set_home;
 	float _t;
+};
+
+struct looper : entity {
+	looper();
+
+	virtual void init();
+	virtual void tick(int move_clipped);
+	virtual void draw(draw_context* dc);
+
+	vec2 _home;
+	bool _set_home;
+	float _t;
+	vec2 _dir;
 };
 
 entity* spawn_entity(world* w, entity* e);

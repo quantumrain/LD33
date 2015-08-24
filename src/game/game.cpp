@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "game.h"
 
-const wchar_t* g_win_name = L"LD33 - You are the Monster";
+const wchar_t* g_win_name = L"LD33 - Snake Strike";
 
 world g_world;
 
@@ -96,6 +96,12 @@ void game_init() {
 					}
 				}
 
+				if (c == 0xFFFF00) {
+					if (looper* f = spawn_entity(w, new looper)) {
+						f->set_pos(p);
+					}
+				}
+
 				if (c == 0x0000FF) {
 					if (farmer* f = spawn_entity(w, new farmer)) {
 						f->set_pos(p);
@@ -131,8 +137,8 @@ void game_frame(vec2i view_size) {
 		dc_ui.rect({ -1000.0f, -1000.0f }, { 1000.0f + 640.0f, 1000.0f + 360.0f }, rgba(0.2f));
 
 		float y = 40.0f;
-		draw_string(dc_ui, vec2(320.0f, y), vec2(4.0f), TEXT_CENTRE | TEXT_VCENTRE, rgba(0.75f), "IN THE WOODS"); y += 28.0f;
-		draw_string(dc_ui, vec2(320.0f, y), vec2(1.5f), TEXT_CENTRE | TEXT_VCENTRE, rgba(0.5f), "By Stephen Cakebread"); y += 7.0f * 8.0f;
+		draw_string(dc_ui, vec2(320.0f, y), vec2(5.0f), TEXT_CENTRE | TEXT_VCENTRE, rgba(0.75f), "SNAKE STRIKE"); y += 28.0f;
+		draw_string(dc_ui, vec2(320.0f, y), vec2(1.3f), TEXT_CENTRE | TEXT_VCENTRE, rgba(0.5f), "created for ludum dare 33 by stephen cakebread"); y += 7.0f * 8.0f;
 
 		draw_string(dc_ui, vec2(320.0f, y), vec2(1.5f), TEXT_CENTRE | TEXT_VCENTRE, rgba(0.65f, 0.65f, 0.65f, 1.0f), "using an xbox 360 controller is recommended"); y += 5.0f * 8.0f;
 

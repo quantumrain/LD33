@@ -177,6 +177,7 @@
     <ClCompile Include="..\src\game\entity.cpp" />
     <ClCompile Include="..\src\game\farmer.cpp" />
     <ClCompile Include="..\src\game\game.cpp" />
+    <ClCompile Include="..\src\game\looper.cpp" />
     <ClCompile Include="..\src\game\npc.cpp" />
     <ClCompile Include="..\src\game\particles.cpp" />
     <ClCompile Include="..\src\game\player.cpp" />

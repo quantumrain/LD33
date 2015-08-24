@@ -27,7 +27,7 @@ float measure_string(font* f, const char* s) {
 	float w = 0.0f;
 	for(; *s; s++)
 		w += measure_glyph(f, *s);
-	return w;
+	return w - 1.0f; // hack
 }
 
 void draw_glyph(const draw_context& dc, font* f, vec2 pos, vec2 scale, int glyph, rgba colour) {

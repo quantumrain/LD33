@@ -90,7 +90,7 @@ player* overlaps_player(entity* e) {
 	if (!p)
 		return 0;
 
-	float d = e->_radius * 0.75f + p->_radius * 0.75f;
+	float d = e->_radius * 0.95f + p->_radius * 0.95f;
 
 	if (within(p, e, d))
 		return p;
@@ -106,7 +106,7 @@ void interact_enemy_and_player(entity* e, rgba c) {
 			fx_explosion(e->_pos, 300.0f, 50, rgba(0.0f, 1.0f), 6.0f, 30);
 			fx_explosion(e->_pos, 600.0f, 20, rgba(0.0f, 1.0f), 3.0f, 37);
 
-			sound_play(sfx::UNIT_EXPLODE, 0.0f, -10.0f);
+			sound_play(sfx::UNIT_EXPLODE, 0.0f, -15.0f);
 
 			vec2 d = normalise(pl->_pos - e->_pos);
 			pl->_vel *= 0.5f;
@@ -145,7 +145,9 @@ void avoid_enemy(world* w, entity* self) {
 
 		self->_vel += d * force_self;
 
-		if (e->_type != ET_PLAYER_BODY)
-			e->_vel -= d * force_e;
+		if (e->_type == ET_PLAYER_BODY)
+			force_e *= 0.5f;
+
+		e->_vel -= d * force_e;
 	}
 }

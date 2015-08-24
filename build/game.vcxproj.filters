@@ -137,6 +137,9 @@
     <ClCompile Include="..\src\game\spinner.cpp">
       <Filter>game</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\game\looper.cpp">
+      <Filter>game</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\shaders\fs_blur_x.hlsl">
